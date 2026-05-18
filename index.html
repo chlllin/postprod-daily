@@ -124,6 +124,13 @@
     line-height: 1.55; flex: 1;
   }
 
+  .prog-line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+  }
+  .prog-line:last-child { border-bottom: none; }
+  .prog-count { font-size: 11px; color: var(--text-muted); }
+
   .card-stats { display: flex; flex-direction: column; gap: 0; flex: 1; }
 
   .stat-row {
@@ -299,11 +306,23 @@ fetch('daily-summary.html')
         ? html.slice(afterFirst, nextEntry)
         : html.slice(afterFirst, afterFirst + 3000);
 
-      const programs = [...chunk.matchAll(/## (.+)/g)]
-        .map(m => m[1].trim()).filter(Boolean);
+      const headingMatches = [...chunk.matchAll(/## ([^\\\n]+)/g)];
+      const previewEl = document.getElementById('summary-preview');
 
-      document.getElementById('summary-preview').textContent =
-        programs.length ? programs.join('・') : '（無節目資料）';
+      if (headingMatches.length) {
+        const lines = headingMatches.map((m, i) => {
+          const name = m[1].trim();
+          const start = m.index + m[0].length;
+          const end = i + 1 < headingMatches.length
+            ? headingMatches[i + 1].index : chunk.length;
+          const section = chunk.slice(start, end);
+          const count = (section.match(/\\n-\s/g) || []).length;
+          return `<div class="prog-line"><span>${name}</span><span class="prog-count">${count} 則</span></div>`;
+        });
+        previewEl.innerHTML = lines.join('');
+      } else {
+        previewEl.textContent = '（無節目資料）';
+      }
     } else {
       dateEl.textContent = '無法讀取';
       document.getElementById('summary-preview').textContent = '—';
