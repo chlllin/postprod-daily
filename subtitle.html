@@ -159,8 +159,8 @@
 
   <div id="section-done">
     <div class="section-header">
-      <div class="section-title">最新完成</div>
-      <span class="section-count">前 5 筆</span>
+      <div class="section-title">近兩週完成</div>
+      <span class="section-count" id="count-done">0 筆</span>
     </div>
     <div class="table-wrap">
       <table>
@@ -181,7 +181,7 @@
 
 <script>
 const DATA = {
-  generated: "2026-05-18",
+  generated: "2026-05-18 09:30",
   pending: [
     { show: "fighting", episode: "13", status: "待字稿回", note: "" },
     { show: "兩鍋論", episode: "25", status: "待字稿回", note: "" }
@@ -202,7 +202,7 @@ const STATUS_BADGE = {
   "完成":     "badge-done"
 };
 
-document.getElementById('updated-time').textContent = '更新：' + DATA.generated;
+document.getElementById('updated-time').textContent = '同步：' + DATA.generated;
 
 // Stats
 const pendingByStatus = {};
@@ -236,15 +236,23 @@ if (DATA.pending.length === 0) {
   ).join('');
 }
 
-// Completed table
+// Completed table — past 14 days
 const tbodyD = document.getElementById('tbody-done');
-tbodyD.innerHTML = DATA.completed.map(r =>
-  `<tr data-section="done">
-    <td><strong>${r.show}</strong></td>
-    <td>${r.episode}</td>
-    <td style="color:var(--text-secondary)">${r.edited}</td>
-  </tr>`
-).join('');
+const refDate = new Date(DATA.generated.split(' ')[0]);
+const cutoff = new Date(refDate); cutoff.setDate(cutoff.getDate() - 14);
+const recentDone = DATA.completed.filter(r => new Date(r.edited) >= cutoff);
+document.getElementById('count-done').textContent = recentDone.length + ' 筆';
+if (recentDone.length === 0) {
+  tbodyD.innerHTML = '<tr class="empty-row"><td colspan="3">近兩週無完成項目</td></tr>';
+} else {
+  tbodyD.innerHTML = recentDone.map(r =>
+    `<tr data-section="done">
+      <td><strong>${r.show}</strong></td>
+      <td>${r.episode}</td>
+      <td style="color:var(--text-secondary)">${r.edited}</td>
+    </tr>`
+  ).join('');
+}
 
 // Filter
 function setFilter(f, btn) {

@@ -258,6 +258,10 @@
           <span class="stat-label">最新完成</span>
           <span class="stat-value" id="s-latest">—</span>
         </div>
+        <div class="stat-row">
+          <span class="stat-label">同步時間</span>
+          <span class="stat-value" id="s-sync-time" style="color:var(--text-muted);font-size:11px">—</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-link">
@@ -394,9 +398,10 @@ fetch('subtitle.html')
     const latest   = DATA.completed.length ? DATA.completed[0].show + ' ' + DATA.completed[0].episode : '—';
     const total    = DATA.pending.length;
 
-    document.getElementById('s-waiting').textContent  = waiting + ' 筆';
-    document.getElementById('s-progress').textContent = progress + ' 筆';
-    document.getElementById('s-latest').textContent   = latest;
+    document.getElementById('s-waiting').textContent    = waiting + ' 筆';
+    document.getElementById('s-progress').textContent   = progress + ' 筆';
+    document.getElementById('s-latest').textContent     = latest;
+    document.getElementById('s-sync-time').textContent  = DATA.generated || '—';
 
     const statusEl = document.getElementById('subtitle-status');
     statusEl.classList.remove('loading');
