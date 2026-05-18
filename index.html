@@ -12,7 +12,6 @@
     --text-primary: #1A1A1A;
     --text-secondary: #6B6B6B;
     --text-muted: #9B9B9B;
-    --accent: #1A1A1A;
     --tag-bg: #F0EDE8;
     --tag-text: #4A4A4A;
     --green: #27AE60;
@@ -37,83 +36,48 @@
     border-bottom: 1px solid var(--border);
     padding: 0 32px;
     height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
   }
 
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
 
   .logo-mark {
-    width: 28px;
-    height: 28px;
-    background: var(--accent);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: #1A1A1A; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 700; flex-shrink: 0;
   }
 
   .topbar-title { font-size: 14px; font-weight: 600; }
   .topbar-subtitle { font-size: 11px; color: var(--text-muted); }
   .topbar-date { font-size: 12px; color: var(--text-secondary); }
 
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 48px 32px;
-  }
+  .main { max-width: 860px; margin: 0 auto; padding: 48px 32px; }
 
-  .hero { margin-bottom: 48px; }
-
+  .hero { margin-bottom: 40px; }
   .hero-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 8px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
   }
-
   .hero-title {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-    margin-bottom: 10px;
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -0.4px; line-height: 1.2; margin-bottom: 8px;
   }
-
-  .hero-desc {
-    font-size: 14px;
-    color: var(--text-secondary);
-    max-width: 480px;
-  }
+  .hero-desc { font-size: 14px; color: var(--text-secondary); }
 
   .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 16px;
-    padding-bottom: 8px;
+    margin-bottom: 16px; padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
   }
 
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 40px;
   }
@@ -122,117 +86,93 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 22px;
-    text-decoration: none;
-    color: inherit;
-    display: block;
+    padding: 24px;
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
     transition: all 0.15s ease;
+    min-height: 230px;
   }
 
   .card:hover {
     border-color: #ccc;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.06);
     transform: translateY(-1px);
   }
 
-  .card.disabled {
-    opacity: 0.5;
-    cursor: default;
-    pointer-events: none;
-  }
-
   .card-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 14px;
-    background: var(--tag-bg);
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; flex-shrink: 0;
+    background: #EDF6F9; color: #2471A3;
+  }
+  .card-icon.warm { background: var(--orange-bg); color: var(--orange); }
+  .card-icon svg { width: 18px; height: 18px; }
+
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+
+  .card-meta {
+    font-size: 11px; font-weight: 500;
+    color: var(--green); background: var(--green-bg);
+    display: inline-block; padding: 2px 8px;
+    border-radius: 20px; margin-bottom: 12px;
+  }
+  .card-meta.loading { color: var(--text-muted); background: var(--tag-bg); }
+  .card-meta.warn { color: var(--orange); background: var(--orange-bg); }
+
+  .card-preview {
+    font-size: 12px; color: var(--text-secondary);
+    line-height: 1.55; flex: 1;
   }
 
-  .card-icon.orange { background: var(--orange-bg); }
+  .card-stats { display: flex; flex-direction: column; gap: 0; flex: 1; }
 
-  .card-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 5px;
+  .stat-row {
+    display: flex; align-items: baseline;
+    justify-content: space-between;
+    font-size: 12px; padding: 6px 0;
+    border-bottom: 1px solid var(--border);
   }
-
-  .card-desc {
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 16px;
-  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-secondary); }
+  .stat-value { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+  .stat-value.warn { color: var(--orange); }
+  .stat-value.ok { color: var(--green); }
 
   .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--border);
   }
 
-  .card-badge {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 8px;
-    border-radius: 20px;
-    background: var(--tag-bg);
-    color: var(--tag-text);
+  .card-link {
+    font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 4px;
+    transition: color 0.12s;
   }
-
-  .card-badge.live {
-    background: var(--green-bg);
-    color: var(--green);
-  }
-
-  .card-arrow {
-    font-size: 16px;
-    color: var(--text-muted);
-    transition: transform 0.15s;
-  }
-
-  .card:hover .card-arrow { transform: translateX(3px); }
+  .card:hover .card-link { color: var(--text-primary); }
 
   .status-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 22px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   }
 
   .status-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    display: flex; align-items: center;
+    gap: 6px; font-size: 12px; color: var(--text-secondary);
   }
 
   .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green);
-    flex-shrink: 0;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
   }
 
-  .status-divider {
-    width: 1px;
-    height: 14px;
-    background: var(--border);
-  }
+  .status-divider { width: 1px; height: 12px; background: var(--border); }
 
   @media (max-width: 600px) {
-    .main { padding: 32px 20px; }
-    .topbar { padding: 0 20px; }
-    .hero-title { font-size: 22px; }
+    .main { padding: 28px 16px; }
+    .topbar { padding: 0 16px; }
+    .hero-title { font-size: 20px; }
     .card-grid { grid-template-columns: 1fr; }
   }
 </style>
@@ -255,49 +195,63 @@
   <div class="hero">
     <div class="hero-eyebrow">Dashboard</div>
     <div class="hero-title">後製部工作台</div>
-    <div class="hero-desc">集中管理每日工作摘要、節目備份狀況與後製相關報告。</div>
+    <div class="hero-desc">每日工作摘要與節目備份狀況一覽。</div>
   </div>
 
   <div class="section-label">工具</div>
   <div class="card-grid">
 
     <a href="daily-summary.html" class="card">
-      <div class="card-icon">📋</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <line x1="8" y1="17" x2="16" y2="17"/>
+        </svg>
+      </div>
       <div class="card-title">每日工作摘要</div>
-      <div class="card-desc">彙整各節目 LINE 對話的每日工作重點，依日期與節目分類瀏覽。</div>
+      <div class="card-meta loading" id="summary-date">讀取中…</div>
+      <div class="card-preview" id="summary-preview"></div>
       <div class="card-footer">
-        <span class="card-badge live">上線中</span>
-        <span class="card-arrow">→</span>
+        <span class="card-link">
+          前往完整摘要
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
       </div>
     </a>
 
     <a href="backup.html" class="card">
-      <div class="card-icon orange">💾</div>
+      <div class="card-icon warm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3"/>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        </svg>
+      </div>
       <div class="card-title">兩鍋論 · 備份狀況</div>
-      <div class="card-desc">《真料理兩鍋論》拍攝檔的麥卡貝硬碟備份進度，含緊急、待處理與已完成狀態。</div>
+      <div class="card-meta loading" id="backup-status">讀取中…</div>
+      <div class="card-stats">
+        <div class="stat-row">
+          <span class="stat-label">棚內最新備份</span>
+          <span class="stat-value" id="b-studio">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">外景最新備份</span>
+          <span class="stat-value" id="b-outdoor">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">尚未備份</span>
+          <span class="stat-value" id="b-pending">—</span>
+        </div>
+      </div>
       <div class="card-footer">
-        <span class="card-badge live">上線中</span>
-        <span class="card-arrow">→</span>
+        <span class="card-link">
+          前往詳細狀況
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
       </div>
     </a>
-
-    <div class="card disabled">
-      <div class="card-icon">📅</div>
-      <div class="card-title">班表核對報告</div>
-      <div class="card-desc">人員排班與錄影行事曆的差異比對，自動標記請假與補班狀態。</div>
-      <div class="card-footer">
-        <span class="card-badge">籌備中</span>
-      </div>
-    </div>
-
-    <div class="card disabled">
-      <div class="card-icon">🎬</div>
-      <div class="card-title">節目進度總覽</div>
-      <div class="card-desc">各節目審帶、音效、完成檔的里程碑進度，串接 Notion 資料庫。</div>
-      <div class="card-footer">
-        <span class="card-badge">籌備中</span>
-      </div>
-    </div>
 
   </div>
 
@@ -316,16 +270,100 @@
 </main>
 
 <script>
-  const d = new Date();
-  const weekdays = ['日','一','二','三','四','五','六'];
-  document.getElementById('today-date').textContent =
-    d.getFullYear() + '/' +
-    String(d.getMonth()+1).padStart(2,'0') + '/' +
-    String(d.getDate()).padStart(2,'0') +
-    ' (週' + weekdays[d.getDay()] + ')';
+const d = new Date();
+const weekdays = ['日','一','二','三','四','五','六'];
+document.getElementById('today-date').textContent =
+  d.getFullYear() + '/' +
+  String(d.getMonth()+1).padStart(2,'0') + '/' +
+  String(d.getDate()).padStart(2,'0') +
+  ' (週' + weekdays[d.getDay()] + ')';
+document.getElementById('build-time').textContent =
+  '頁面讀取於 ' + d.toLocaleDateString('zh-TW');
 
-  document.getElementById('build-time').textContent =
-    '頁面更新於 ' + d.toLocaleDateString('zh-TW');
+// ── 每日摘要 ──────────────────────────────────────────────────
+fetch('daily-summary.html')
+  .then(r => r.text())
+  .then(html => {
+    const dateM = html.match(/# 每日摘要｜(\d{4}-\d{2}-\d{2})/);
+    const date = dateM ? dateM[1] : null;
+
+    const dateEl = document.getElementById('summary-date');
+    if (date) {
+      dateEl.textContent = '最新｜' + date;
+      dateEl.classList.remove('loading');
+
+      // 找這天的所有節目（## 標題）
+      const afterFirst = html.indexOf('# 每日摘要｜' + date);
+      const nextEntry = html.indexOf('# 每日摘要｜', afterFirst + 1);
+      const chunk = nextEntry > -1
+        ? html.slice(afterFirst, nextEntry)
+        : html.slice(afterFirst, afterFirst + 3000);
+
+      const programs = [...chunk.matchAll(/## (.+)/g)]
+        .map(m => m[1].trim()).filter(Boolean);
+
+      document.getElementById('summary-preview').textContent =
+        programs.length ? programs.join('・') : '（無節目資料）';
+    } else {
+      dateEl.textContent = '無法讀取';
+      document.getElementById('summary-preview').textContent = '—';
+    }
+  })
+  .catch(() => {
+    document.getElementById('summary-date').textContent = '讀取失敗';
+  });
+
+// ── 備份狀況 ──────────────────────────────────────────────────
+fetch('backup.html')
+  .then(r => r.text())
+  .then(html => {
+    const m = html.match(/const DATA = ({[\s\S]+?});\s*\n/);
+    if (!m) throw new Error('no data');
+    const DATA = (new Function('return ' + m[1]))();
+
+    function getStatus(r) {
+      if (r.note === 'ed65-f已刪') return 'deleted';
+      if (r.mccabe === '無記錄') return 'no-record';
+      if (!r.mccabe || r.mccabe === '' || r.mccabe === '—') return 'urgent';
+      return 'ok';
+    }
+
+    function latestBacked(rows) {
+      const backed = rows.filter(r => getStatus(r) === 'ok');
+      return backed.length ? backed[backed.length - 1].folder : '—';
+    }
+
+    function fmtFolder(f) {
+      if (!f || f === '—') return '—';
+      const m = f.match(/^(\d{4})(\d{2})(\d{2})(.*)/);
+      return m ? m[1] + '/' + m[2] + '/' + m[3] + (m[4] ? m[4] : '') : f;
+    }
+
+    const studioLatest = latestBacked(DATA['棚內']);
+    const outdoorLatest = latestBacked(DATA['外景']);
+    const urgentTotal =
+      DATA['棚內'].filter(r => getStatus(r) === 'urgent').length +
+      DATA['外景'].filter(r => getStatus(r) === 'urgent').length;
+
+    document.getElementById('b-studio').textContent = fmtFolder(studioLatest);
+    document.getElementById('b-outdoor').textContent = fmtFolder(outdoorLatest);
+
+    const pendingEl = document.getElementById('b-pending');
+    pendingEl.textContent = urgentTotal + ' 筆';
+    pendingEl.className = 'stat-value ' + (urgentTotal > 0 ? 'warn' : 'ok');
+
+    const statusEl = document.getElementById('backup-status');
+    statusEl.classList.remove('loading');
+    if (urgentTotal > 0) {
+      statusEl.textContent = urgentTotal + ' 筆待備份';
+      statusEl.classList.add('warn');
+    } else {
+      statusEl.textContent = '全數已備份';
+    }
+  })
+  .catch(() => {
+    document.getElementById('backup-status').textContent = '讀取失敗';
+  });
 </script>
 
 </body>
