@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>真料理兩鍋論 · 備份狀況</title>
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E6E1;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --text-muted: #9B9B9B;
+    --accent: #1A1A1A;
+    --tag-bg: #F0EDE8;
+    --highlight: #F5F0EB;
+    --sidebar-width: 230px;
+    --red: #C0392B; --red-bg: #FDF0EE;
+    --orange: #D35400; --orange-bg: #FEF5EC;
+    --gray: #777; --gray-bg: #F4F4F4;
+    --green: #27AE60; --green-bg: #EDFAF1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text-primary);
+    line-height: 1.6; font-size: 14px; min-height: 100vh;
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-width); position: fixed;
+    top: 0; left: 0; bottom: 0; background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden; z-index: 10;
+  }
+  .sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
+  .sidebar-project { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .sidebar-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Tab buttons */
+  .tab-row { display: flex; padding: 12px 16px; gap: 6px; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    flex: 1; padding: 7px 0; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer;
+    background: transparent; color: var(--text-secondary); transition: all 0.15s;
+  }
+  .tab-btn:hover { background: var(--tag-bg); }
+  .tab-btn.active { background: #444; color: white; border-color: #444; }
+
+  /* Stats */
+  .stats { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+  .stat-row { display: flex; align-items: center; justify-content: space-between; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+  .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .stat-dot.urgent { background: var(--red); }
+  .stat-dot.no-record { background: var(--orange); }
+  .stat-dot.deleted { background: #bbb; }
+  .stat-dot.ok { background: var(--green); }
+  .stat-num { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+
+  /* Filter */
+  .filter-section { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .filter-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .filter-btns { display: flex; flex-direction: column; gap: 4px; }
+  .filter-btn {
+    padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 12px; cursor: pointer; background: transparent;
+    color: var(--text-secondary); text-align: left; transition: all 0.12s;
+  }
+  .filter-btn:hover { background: var(--highlight); }
+  .filter-btn.active { background: var(--tag-bg); border-color: #ccc; color: var(--text-primary); font-weight: 500; }
+
+  /* Main */
+  .main {
+    margin-left: var(--sidebar-width); flex: 1;
+    display: flex; flex-direction: column;
+    height: 100vh; overflow: hidden;
+    padding: 36px 40px 0;
+  }
+  .main-header { margin-bottom: 16px; flex-shrink: 0; }
+  .main-title { font-size: 20px; font-weight: 700; }
+  .main-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto; overflow-y: auto;
+    flex: 1; border: 1px solid var(--border); border-radius: 8px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+    border-bottom: 2px solid var(--border); white-space: nowrap;
+    position: sticky; top: 0; background: #FAFAF8; z-index: 1;
+  }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr.row-urgent { background: var(--red-bg); }
+  tr.row-no-record { background: var(--orange-bg); }
+  tr.row-deleted { background: var(--gray-bg); opacity: 0.75; }
+  tr.row-ok { background: transparent; }
+  tr:hover td { background: rgba(0,0,0,0.02); }
+  tr.hidden { display: none; }
+
+  .badge {
+    display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px;
+    font-weight: 500; white-space: nowrap;
+  }
+  .badge-urgent { background: var(--red-bg); color: var(--red); border: 1px solid #f5c0ba; }
+  .badge-no-record { background: var(--orange-bg); color: var(--orange); border: 1px solid #f8d8b8; }
+  .badge-deleted { background: #eee; color: #888; border: 1px solid #ddd; }
+  .badge-ok { background: var(--green-bg); color: var(--green); border: 1px solid #b7eccd; }
+  .badge-ed65-yes { color: var(--green); font-weight: 600; }
+  .badge-ed65-no { color: var(--text-muted); }
+
+  .note-tag { font-size: 11px; color: #999; font-style: italic; }
+
+  /* Legend */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; flex-shrink: 0;
+    margin-top: 12px; margin-bottom: 20px; padding: 12px 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Count badge */
+  .count-badge { display: inline-block; padding: 0 6px; border-radius: 10px;
+    font-size: 10px; font-weight: 600; min-width: 18px; text-align: center; }
+  .count-urgent { background: #fde8e5; color: var(--red); }
+  .count-orange { background: #fef0e0; color: var(--orange); }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color 0.12s;
+  }
+  .back-link:hover { color: var(--text-primary); }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="back-link">← 工作台</a>
+    <div class="sidebar-title">備份狀況</div>
+    <div class="sidebar-project">真料理兩鍋論</div>
+    <div class="sidebar-date">更新：2026-05-18</div>
+  </div>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('棚內')">棚內</button>
+    <button class="tab-btn" onclick="switchTab('外景')">外景</button>
+  </div>
+  <div class="stats" id="stats-panel"></div>
+  <div class="filter-section">
+    <div class="filter-label">篩選</div>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter('all')">全部</button>
+      <button class="filter-btn" onclick="setFilter('urgent')">⚠️ 未備份</button>
+      <button class="filter-btn" onclick="setFilter('no-record')">🟠 無記錄</button>
+      <button class="filter-btn" onclick="setFilter('deleted')">— ed65-f 已刪</button>
+      <button class="filter-btn" onclick="setFilter('ok')">✅ 已備份</button>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="main-header" id="main-header"></div>
+  <div class="table-wrap">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th>資料夾名稱</th>
+          <th>狀態</th>
+          <th>在 ed65-f</th>
+          <th>備份硬碟</th>
+          <th>備份硬碟可刪</th>
+          <th>麥卡貝備份日期</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>未備份（麥卡貝無記錄）</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>無記錄（早期外景）</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bbb"></div>ed65-f 已刪，備份仍存</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>已備份（麥卡貝確認）</div>
+  </div>
+</main>
+</div>
+
+<script>
+const DATA = {
+  "棚內": [{"folder":"20251030","ed65":"否","hdd":"備份硬碟01_8T","deletable":"是","mccabe":"","note":""},{"folder":"20251118","ed65":"否","hdd":"已刪(曾HD02)","deletable":"是","mccabe":"","note":""},{"folder":"20251125","ed65":"否","hdd":"已刪(曾HD02)","deletable":"是","mccabe":"20260121","note":""},{"folder":"20251215","ed65":"否","hdd":"備份硬碟05_18T","deletable":"","mccabe":"20260121","note":""},{"folder":"20251223","ed65":"否","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260107","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260119","ed65":"是","hdd":"備份硬碟06_18T","deletable":"","mccabe":"20260317","note":""},{"folder":"20260203","ed65":"是","hdd":"備份硬碟06_18T","deletable":"","mccabe":"20260317","note":""},{"folder":"20260312","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260325","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260410","ed65":"是","hdd":"","deletable":"","mccabe":"","note":""},{"folder":"20260420","ed65":"是","hdd":"","deletable":"","mccabe":"","note":""},{"folder":"20260504","ed65":"是","hdd":"","deletable":"","mccabe":"","note":""}],
+  "外景": [{"folder":"20250926","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251001","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251003","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251013","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251013 兩鍋論第二集駕駛員 主題公布","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251014","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251017","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251024","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251027","ed65":"否","hdd":"備份硬碟01_8T","deletable":"","mccabe":"無記錄","note":""},{"folder":"20251101","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260507","note":"ed65-f已刪"},{"folder":"20251104","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251107","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251108","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251110","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251123","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251126 EP10主題公布","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251127","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251202","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251205","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251208 溫妮","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251212 EP6 主題公布","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251214","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251216","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251217","ed65":"否","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"1219市區空景","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20251218","ed65":"否","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":"ed65-f已刪"},{"folder":"20251219","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":""},{"folder":"20251226 丘涵","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":""},{"folder":"20251226 溫妮","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":""},{"folder":"20251227 邱涵","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":""},{"folder":"20251231溫妮","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260121","note":""},{"folder":"20260105 丘涵","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260111溫妮","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260114","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260116","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260121","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260122 君白","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260122 斐棋","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260202","note":""},{"folder":"20260127 君白","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260317","note":""},{"folder":"20260225 君白","ed65":"是","hdd":"備份硬碟07_16T","deletable":"","mccabe":"20260317","note":""},{"folder":"20260302 斐棋","ed65":"是","hdd":"","deletable":"","mccabe":"20260317","note":""},{"folder":"20260303 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260317","note":""},{"folder":"20260303 斐棋","ed65":"是","hdd":"","deletable":"","mccabe":"20260317","note":""},{"folder":"全家甄選PROMO","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"全家甄選PROMO 吳秉承","ed65":"是","hdd":"","deletable":"","mccabe":"20260317","note":""},{"folder":"花絮拍帶","ed65":"是","hdd":"已刪(曾HD02)","deletable":"","mccabe":"20260317","note":""},{"folder":"20260315 斐琪","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260317 斐琪","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260319 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260327 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260327 斐琪2","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260331君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260402 斐琪","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260402君白(花蓮)","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260408 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260414 斐棋","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260415 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260415 斐棋","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260417","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260427 君白","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260428 斐棋","ed65":"是","hdd":"","deletable":"","mccabe":"20260507","note":""},{"folder":"20260507 全家甄選(邰)","ed65":"是","hdd":"—","deletable":"—","mccabe":"—","note":""},{"folder":"20260508 斐棋","ed65":"是","hdd":"—","deletable":"—","mccabe":"—","note":""}]
+};
+
+let currentTab = '棚內';
+let currentFilter = 'all';
+
+function getStatus(r) {
+  if (r.note === 'ed65-f已刪') return 'deleted';
+  if (r.mccabe === '無記錄') return 'no-record';
+  if (!r.mccabe || r.mccabe === '' || r.mccabe === '—') return 'urgent';
+  return 'ok';
+}
+
+function statusBadge(s) {
+  const m = { urgent: ['badge-urgent','⚠️ 未備份'], 'no-record': ['badge-no-record','無記錄'], deleted: ['badge-deleted','ed65-f已刪'], ok: ['badge-ok','已備份'] };
+  const [cls, lbl] = m[s];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function formatMccabe(v) {
+  if (!v || v === '' || v === '—') return '<span style="color:#ccc">—</span>';
+  if (v === '無記錄') return `<span style="color:var(--orange)">${v}</span>`;
+  return v;
+}
+
+function render() {
+  const rows = DATA[currentTab];
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const s = getStatus(r);
+    const show = currentFilter === 'all' || currentFilter === s;
+    const tr = document.createElement('tr');
+    tr.className = `row-${s}${show ? '' : ' hidden'}`;
+    tr.dataset.status = s;
+    tr.innerHTML = `
+      <td><strong>${r.folder}</strong></td>
+      <td>${statusBadge(s)}</td>
+      <td><span class="${r.ed65==='是'?'badge-ed65-yes':'badge-ed65-no'}">${r.ed65}</span></td>
+      <td style="color:${r.hdd?'inherit':'#ccc'}">${r.hdd||'—'}</td>
+      <td style="color:${r.deletable&&r.deletable!=='—'?'inherit':'#ccc'}">${r.deletable||'—'}</td>
+      <td>${formatMccabe(r.mccabe)}</td>
+      <td>${r.note?`<span class="note-tag">${r.note}</span>`:'<span style="color:#ccc">—</span>'}</td>`;
+    tbody.appendChild(tr);
+  });
+  updateStats(rows);
+  updateHeader(rows);
+}
+
+function updateStats(rows) {
+  const counts = { urgent:0, 'no-record':0, deleted:0, ok:0 };
+  rows.forEach(r => counts[getStatus(r)]++);
+  document.getElementById('stats-panel').innerHTML = `
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot urgent"></span>未備份</span><span class="stat-num">${counts.urgent}</span></div>
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot no-record"></span>無記錄</span><span class="stat-num">${counts['no-record']}</span></div>
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot deleted"></span>ed65-f已刪</span><span class="stat-num">${counts.deleted}</span></div>
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot ok"></span>已備份</span><span class="stat-num">${counts.ok}</span></div>
+    <div class="stat-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:6px"><span class="stat-label">總計</span><span class="stat-num">${rows.length}</span></div>
+  `;
+}
+
+function updateHeader(rows) {
+  const urgentCount = rows.filter(r => getStatus(r)==='urgent').length;
+  const badge = urgentCount > 0 ? ` <span class="count-badge count-urgent">${urgentCount} 筆待處理</span>` : '';
+  document.getElementById('main-header').innerHTML = `
+    <div class="main-title">${currentTab}${badge}</div>
+    <div class="main-sub">共 ${rows.length} 筆拍攝資料</div>`;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['棚內','外景'][i]===tab));
+  render();
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('#table-body tr').forEach(tr => {
+    tr.classList.toggle('hidden', f !== 'all' && tr.dataset.status !== f);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
