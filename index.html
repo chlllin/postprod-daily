@@ -145,6 +145,13 @@
   .stat-value.warn { color: var(--orange); }
   .stat-value.ok { color: var(--green); }
 
+  .stat-group-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--text-muted);
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .card-stats .stat-group-label:first-child { border-top: none; padding-top: 0; }
+
   .card-footer {
     display: flex; align-items: center; justify-content: flex-end;
     margin-top: 16px; padding-top: 14px;
@@ -271,15 +278,25 @@
       <div class="card-title">兩鍋論 · 備份狀況</div>
       <div class="card-meta loading" id="backup-status">讀取中…</div>
       <div class="card-stats">
+        <div class="stat-group-label">麥卡貝</div>
         <div class="stat-row">
-          <span class="stat-label">棚內最新備份</span>
-          <span class="stat-value" id="b-studio">—</span>
+          <span class="stat-label">棚內最新</span>
+          <span class="stat-value" id="b-mc-studio">—</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">外景最新備份</span>
-          <span class="stat-value" id="b-outdoor">—</span>
+          <span class="stat-label">外景最新</span>
+          <span class="stat-value" id="b-mc-outdoor">—</span>
+        </div>
+        <div class="stat-group-label">備份硬碟</div>
+        <div class="stat-row">
+          <span class="stat-label">棚內最新</span>
+          <span class="stat-value" id="b-hdd-studio">—</span>
         </div>
         <div class="stat-row">
+          <span class="stat-label">外景最新</span>
+          <span class="stat-value" id="b-hdd-outdoor">—</span>
+        </div>
+        <div class="stat-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:6px">
           <span class="stat-label">尚未備份</span>
           <span class="stat-value" id="b-pending">—</span>
         </div>
@@ -405,25 +422,24 @@ fetch('backup.html')
       return 'ok';
     }
 
-    function latestBacked(rows) {
+    function latestMccabe(rows) {
       const backed = rows.filter(r => getStatus(r) === 'ok');
       return backed.length ? backed[backed.length - 1].folder : '—';
     }
 
-    function fmtFolder(f) {
-      if (!f || f === '—') return '—';
-      const m = f.match(/^(\d{4})(\d{2})(\d{2})(.*)/);
-      return m ? m[1] + '/' + m[2] + '/' + m[3] + (m[4] ? m[4] : '') : f;
+    function latestHdd(rows) {
+      const backed = rows.filter(r => r.hdd && r.hdd !== '' && r.hdd !== '—' && !r.hdd.startsWith('已刪'));
+      return backed.length ? backed[backed.length - 1].folder : '—';
     }
 
-    const studioLatest = latestBacked(DATA['棚內']);
-    const outdoorLatest = latestBacked(DATA['外景']);
     const urgentTotal =
       DATA['棚內'].filter(r => getStatus(r) === 'urgent').length +
       DATA['外景'].filter(r => getStatus(r) === 'urgent').length;
 
-    document.getElementById('b-studio').textContent = fmtFolder(studioLatest);
-    document.getElementById('b-outdoor').textContent = fmtFolder(outdoorLatest);
+    document.getElementById('b-mc-studio').textContent  = latestMccabe(DATA['棚內']);
+    document.getElementById('b-mc-outdoor').textContent = latestMccabe(DATA['外景']);
+    document.getElementById('b-hdd-studio').textContent  = latestHdd(DATA['棚內']);
+    document.getElementById('b-hdd-outdoor').textContent = latestHdd(DATA['外景']);
 
     const pendingEl = document.getElementById('b-pending');
     pendingEl.textContent = urgentTotal + ' 筆';
