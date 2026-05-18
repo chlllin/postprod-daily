@@ -228,6 +228,38 @@
       </div>
     </a>
 
+    <a href="subtitle.html" class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <line x1="6" y1="10" x2="18" y2="10"/>
+          <line x1="6" y1="14" x2="14" y2="14"/>
+        </svg>
+      </div>
+      <div class="card-title">字幕進度</div>
+      <div class="card-meta loading" id="subtitle-status">讀取中…</div>
+      <div class="card-stats">
+        <div class="stat-row">
+          <span class="stat-label">待字稿回</span>
+          <span class="stat-value" id="s-waiting">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">可上字 / 上字未完</span>
+          <span class="stat-value" id="s-progress">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">最新完成</span>
+          <span class="stat-value" id="s-latest">—</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link">
+          前往字幕進度
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </div>
+    </a>
+
     <a href="backup.html" class="card">
       <div class="card-icon warm">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -330,6 +362,32 @@ fetch('daily-summary.html')
   })
   .catch(() => {
     document.getElementById('summary-date').textContent = '讀取失敗';
+  });
+
+// ── 字幕進度 ──────────────────────────────────────────────────
+fetch('subtitle.html')
+  .then(r => r.text())
+  .then(html => {
+    const m = html.match(/const DATA = ({[\s\S]+?});\s*\n/);
+    if (!m) throw new Error('no data');
+    const DATA = (new Function('return ' + m[1]))();
+
+    const waiting  = DATA.pending.filter(r => r.status === '待字稿回').length;
+    const progress = DATA.pending.filter(r => r.status === '可上字' || r.status === '上字未完').length;
+    const latest   = DATA.completed.length ? DATA.completed[0].show + ' ' + DATA.completed[0].episode : '—';
+    const total    = DATA.pending.length;
+
+    document.getElementById('s-waiting').textContent  = waiting + ' 筆';
+    document.getElementById('s-progress').textContent = progress + ' 筆';
+    document.getElementById('s-latest').textContent   = latest;
+
+    const statusEl = document.getElementById('subtitle-status');
+    statusEl.classList.remove('loading');
+    statusEl.textContent = total > 0 ? total + ' 筆未完成' : '全數完成';
+    if (total > 0) statusEl.classList.add('warn');
+  })
+  .catch(() => {
+    document.getElementById('subtitle-status').textContent = '讀取失敗';
   });
 
 // ── 備份狀況 ──────────────────────────────────────────────────
